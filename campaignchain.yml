@@ -1,0 +1,12 @@
+modules:
+    campaignchain-linkedin-share-news-item:
+        display_name: 'Share News'
+        channels:
+            - campaignchain/channel-linkedin/campaignchain-linkedin
+        routes:
+            new: campaignchain_activity_linkedin_share_news_item_new
+            edit: campaignchain_activity_linkedin_share_news_item_edit
+            edit_modal: campaignchain_activity_linkedin_share_news_item_edit_modal
+            edit_api: campaignchain_activity_linkedin_share_news_item_edit_api
+        hooks:
+            campaignchain-due: true

@@ -1,0 +1,17 @@
+campaignchain_activity_linkedin_share_news_item_new:
+    pattern:  /activity/linkedin/share-news-item/new
+    defaults: { _controller: CampaignChainActivityLinkedInBundle:ShareNewsItem:new }
+
+campaignchain_activity_linkedin_share_news_item_edit:
+    pattern:  /activity/linkedin/share-news-item/{id}/edit
+    defaults: { _controller: CampaignChainActivityLinkedInBundle:ShareNewsItem:edit }
+
+campaignchain_activity_linkedin_share_news_item_edit_modal:
+    pattern:  /modal/activity/linkedin/share-news-item/{id}/edit
+    defaults: { _controller: CampaignChainActivityLinkedInBundle:ShareNewsItem:editModal }
+
+campaignchain_activity_linkedin_share_news_item_edit_api:
+    pattern:  /api/v1/activity/linkedin/share-news-item/byactivity/{id}/edit
+    defaults: { _controller: CampaignChainActivityLinkedInBundle:ShareNewsItem:editApi }
+    options:
+        expose: true

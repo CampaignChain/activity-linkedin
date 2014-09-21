@@ -1,0 +1,7 @@
+parameters:
+#    campaignchain_activity_linked_in.example.class: CampaignChain\Activity\LinkedInBundle\Example
+
+services:
+#    campaignchain_activity_linked_in.example:
+#        class: %campaignchain_activity_linked_in.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]
