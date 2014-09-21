@@ -17,5 +17,8 @@
         "campaignchain/location-linkedin": "dev-master",
         "campaignchain/operation-linkedin": "dev-master",
         "campaignchain/hook-due": "dev-master"
+    },
+    "autoload": {
+        "psr-4": { "CampaignChain\\Activity\\LinkedInBundle\\": "" }
     }
 }
