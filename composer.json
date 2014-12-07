@@ -20,5 +20,20 @@
     },
     "autoload": {
         "psr-4": { "CampaignChain\\Activity\\LinkedInBundle\\": "" }
+    },
+    "extra": {
+        "campaignchain": {
+            "kernel": {
+                "classes": [
+                    "CampaignChain\\Activity\\LinkedInBundle\\CampaignChainActivityLinkedInBundle"
+                ],
+                "routing":
+                {
+                    "name": "campaignchain_activity_linked_in",
+                    "resource": "@CampaignChainActivityLinkedInBundle/Resources/config/routing.yml",
+                    "prefix": "/"
+                }
+            }
+        }
     }
 }
