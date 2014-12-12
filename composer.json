@@ -12,11 +12,11 @@
         }
     ],
     "require": {
-        "campaignchain/core": ">=dev-1.0.0-alpha.4",
-        "campaignchain/channel-linkedin": ">=1.0.0-alpha.3",
-        "campaignchain/location-linkedin": ">=1.0.0-alpha.3",
-        "campaignchain/operation-linkedin": ">=dev-1.0.0-alpha.4",
-        "campaignchain/hook-due": ">=1.0.0-alpha.3"
+        "campaignchain/core": "dev-1.0.0-alpha.4",
+        "campaignchain/channel-linkedin": "1.0.0-alpha.3",
+        "campaignchain/location-linkedin": "1.0.0-alpha.3",
+        "campaignchain/operation-linkedin": "dev-1.0.0-alpha.4",
+        "campaignchain/hook-due": "1.0.0-alpha.3"
     },
     "autoload": {
         "psr-4": { "CampaignChain\\Activity\\LinkedInBundle\\": "" }
