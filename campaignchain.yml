@@ -8,5 +8,6 @@ modules:
             edit: campaignchain_activity_linkedin_share_news_item_edit
             edit_modal: campaignchain_activity_linkedin_share_news_item_edit_modal
             edit_api: campaignchain_activity_linkedin_share_news_item_edit_api
+            read: campaignchain_activity_linkedin_share_news_item_read
         hooks:
             campaignchain-due: true
