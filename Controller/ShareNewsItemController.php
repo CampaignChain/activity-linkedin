@@ -304,4 +304,36 @@ class ShareNewsItemController extends Controller
         $response = new Response($serializer->serialize($responseData, 'json'));
         return $response->setStatusCode(Response::HTTP_OK);
     }
+
+    public function readAction(Request $request, $id)
+    {
+        $activityService = $this->get('campaignchain.core.activity');
+        $activity = $activityService->getActivity($id);
+        $campaign = $activity->getCampaign();
+
+        // Get the one operation.
+        $operation = $activityService->getOperation($id);
+        $operationService = $this->get('campaignchain.operation.linkedin.news_item');
+        $newsitem = $operationService->getNewsItemByOperation($operation);
+
+        if(!$newsitem->getLinkedinData()){
+            $client = $this->container->get('campaignchain.channel.linkedin.rest.client');
+            $connection = $client->connectByActivity($activity);
+
+            // Get the data of the item as stored by Linkedin
+            $request = $connection->get('people/~/network/updates/key='.$newsitem->getUpdateKey().'?format=json');
+            $response = $request->send()->json();
+            $newsitem->setLinkedinData($response);
+
+            $this->getDoctrine()->getManager()->flush();
+        }
+
+        return $this->render(
+            'CampaignChainOperationLinkedInBundle::read.html.twig',
+            array(
+                'page_title' => $activity->getName(),
+                'news_item' => $newsitem,
+                'activity' => $activity,
+            ));
+    }
 }
