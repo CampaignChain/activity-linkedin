@@ -316,16 +316,23 @@ class ShareNewsItemController extends Controller
         $operationService = $this->get('campaignchain.operation.linkedin.news_item');
         $newsitem = $operationService->getNewsItemByOperation($operation);
 
+        $isLive = true;
+
         if(!$newsitem->getLinkedinData()){
-            $client = $this->container->get('campaignchain.channel.linkedin.rest.client');
-            $connection = $client->connectByActivity($activity);
+            try {
+                $client = $this->container->get('campaignchain.channel.linkedin.rest.client');
+                $connection = $client->connectByActivity($activity);
 
-            // Get the data of the item as stored by Linkedin
-            $request = $connection->get('people/~/network/updates/key='.$newsitem->getUpdateKey().'?format=json');
-            $response = $request->send()->json();
-            $newsitem->setLinkedinData($response);
+                // Get the data of the item as stored by Linkedin
+                $request = $connection->get('people/~/network/updates/key='.$newsitem->getUpdateKey().'?format=json');
+                $response = $request->send()->json();
 
-            $this->getDoctrine()->getManager()->flush();
+                $newsitem->setLinkedinData($response);
+
+                $this->getDoctrine()->getManager()->flush();
+            } catch (\Exception $e) {
+                $isLive = false;
+            }
         }
 
         return $this->render(
@@ -334,6 +341,7 @@ class ShareNewsItemController extends Controller
                 'page_title' => $activity->getName(),
                 'news_item' => $newsitem,
                 'activity' => $activity,
+                'is_live' => $isLive,
             ));
     }
 }
