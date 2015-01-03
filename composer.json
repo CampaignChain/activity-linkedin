@@ -15,7 +15,7 @@
         "campaignchain/core": "dev-1.0.0-alpha.4",
         "campaignchain/location-linkedin": "dev-1.0.0-alpha.4",
         "campaignchain/operation-linkedin": "dev-1.0.0-alpha.4",
-        "campaignchain/hook-due": "1.0.0-alpha.3"
+        "campaignchain/hook-due": "dev-1.0.0-alpha.4"
     },
     "autoload": {
         "psr-4": { "CampaignChain\\Activity\\LinkedInBundle\\": "" }
