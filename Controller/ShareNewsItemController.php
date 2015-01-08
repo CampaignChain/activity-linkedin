@@ -285,7 +285,7 @@ class ShareNewsItemController extends Controller
         $repository->persist($status);
 
         $hookService = $this->get('campaignchain.core.hook');
-        $activity = $hookService->processHooks(self::BUNDLE_NAME, self::MODULE_IDENTIFIER, $activity, $data);
+        $hookService->processHooks(self::BUNDLE_NAME, self::MODULE_IDENTIFIER, $activity, $data);
 
         $repository->flush();
 
