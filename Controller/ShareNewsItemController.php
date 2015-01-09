@@ -33,6 +33,7 @@ class ShareNewsItemController extends Controller
         $wizard = $this->get('campaignchain.core.activity.wizard');
         $campaign = $wizard->getCampaign();
         $activity = $wizard->getActivity();
+        $location = $wizard->getLocation();
 
         $activity->setEqualsOperation(true);
 
@@ -40,6 +41,11 @@ class ShareNewsItemController extends Controller
         $activityType->setBundleName(self::BUNDLE_NAME);
         $activityType->setModuleIdentifier(self::MODULE_IDENTIFIER);
         $shareNewsItemOperation = new ShareNewsItemOperationType($this->getDoctrine()->getManager(), $this->get('service_container'));
+
+        $locationService = $this->get('campaignchain.core.location');
+        $location = $locationService->getLocation($location->getId());
+        $shareNewsItemOperation->setLocation($location);
+
         $operationForms[] = array(
             'identifier' => self::OPERATION_IDENTIFIER,
             'form' => $shareNewsItemOperation,
