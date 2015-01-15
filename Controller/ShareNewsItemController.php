@@ -288,7 +288,7 @@ class ShareNewsItemController extends Controller
         $repository = $this->getDoctrine()->getManager();
         $repository->persist($activity);
         $repository->persist($operation);
-        $repository->persist($status);
+        $repository->persist($newsitem);
 
         $hookService = $this->get('campaignchain.core.hook');
         $hookService->processHooks(self::BUNDLE_NAME, self::MODULE_IDENTIFIER, $activity, $data);
