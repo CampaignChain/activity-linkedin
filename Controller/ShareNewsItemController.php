@@ -127,7 +127,7 @@ class ShareNewsItemController extends Controller
             // Status Update to be sent immediately?
             // TODO: This is an intermediary hardcoded hack and should be instead handled by the scheduler.
             if ($form->get('campaignchain_hook_campaignchain_due')->has('execution_choice') && $form->get('campaignchain_hook_campaignchain_due')->get('execution_choice')->getData() == 'now') {
-                $job = $this->get('campaignchain.operation.linkedin.job.share_news_item');
+                $job = $this->get('campaignchain.job.operation.linkedin.share_news_item');
                 $job->execute($operation->getId());
                 // TODO: Add different flashbag which includes link to posted message on Facebook
             }
@@ -208,7 +208,7 @@ class ShareNewsItemController extends Controller
             );
 
             if ($form->get('campaignchain_hook_campaignchain_due')->has('execution_choice') && $form->get('campaignchain_hook_campaignchain_due')->get('execution_choice')->getData() == 'now') {
-                $job = $this->get('campaignchain.operation.linkedin.job.share_news_item');
+                $job = $this->get('campaignchain.job.operation.linkedin.share_news_item');
                 $job->execute($operation->getId());
                 // TODO: Add different flashbag which includes link to posted message on Facebook
             }
