@@ -12,10 +12,10 @@
         }
     ],
     "require": {
-        "campaignchain/core": "1.0.0-alpha.4",
-        "campaignchain/location-linkedin": "1.0.0-alpha.4",
-        "campaignchain/operation-linkedin": "1.0.0-alpha.4",
-        "campaignchain/hook-due": "1.0.0-alpha.4"
+        "campaignchain/core": "dev-master",
+        "campaignchain/location-linkedin": "dev-master",
+        "campaignchain/operation-linkedin": "dev-master",
+        "campaignchain/hook-due": "dev-master"
     },
     "autoload": {
         "psr-4": { "CampaignChain\\Activity\\LinkedInBundle\\": "" }
