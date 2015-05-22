@@ -10,4 +10,5 @@ modules:
             edit_api: campaignchain_activity_linkedin_share_news_item_edit_api
             read: campaignchain_activity_linkedin_share_news_item_read
         hooks:
-            campaignchain-due: true
+            default:
+                campaignchain-due: true
