@@ -1,7 +1,7 @@
 {
     "name": "campaignchain/activity-linkedin",
     "description": "Post a news update on a LinkedIn stream.",
-    "keywords": ["linkedin","news"],
+    "keywords": ["linkedin","news","campaignchain"],
     "type": "campaignchain-activity",
     "homepage": "http://www.campaignchain.com",
     "license": "Apache-2.0",
