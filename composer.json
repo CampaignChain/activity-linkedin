@@ -1,16 +1,21 @@
 {
     "name": "campaignchain/activity-linkedin",
     "description": "Post a news update on a LinkedIn stream.",
-    "keywords": ["linkedin","news","campaignchain"],
+    "keywords": ["linkedin","campaignchain"],
     "type": "campaignchain-activity",
     "homepage": "http://www.campaignchain.com",
     "license": "Apache-2.0",
     "authors": [
         {
-            "name": "Sandro Groganz",
-            "email": "sandro@campaignchain.com"
+            "name": "CampaignChain Inc.",
+            "email": "info@campaignchain.com",
+            "homepage": "http://www.campaignchain.com"
         }
     ],
+    "support": {
+        "issues": "https://github.com/CampaignChain/campaignchain-ce/issues",
+        "docs": "http://doc.campaignchain.com"
+    },
     "require": {
         "campaignchain/core": "dev-master",
         "campaignchain/location-linkedin": "dev-master",
