@@ -1,7 +1,33 @@
+# This file is part of the CampaignChain package.
+#
+# (c) CampaignChain Inc. <info@campaignchain.com>
+#
+# For the full copyright and license information, please view the LICENSE
+# file that was distributed with this source code.
+
 parameters:
-#    campaignchain_activity_linked_in.example.class: CampaignChain\Activity\LinkedInBundle\Example
+    campaignchain.activity.linkedin.share_news_item:
+        activity_bundle_name: "campaignchain/activity-linkedin"
+        activity_module_identifier: "campaignchain-linkedin-share-news-item"
+        operation_bundle_name: "campaignchain/operation-linkedin"
+        operation_module_identifier: "campaignchain-linkedin-share-news-item"
+        location_bundle_name: "campaignchain/location-linkedin"
+        location_module_identifier: "campaignchain-linkedin-user"
+        handler: "campaignchain.activity.controller.handler.linkedin.share_news_item"
+        equals_operation: true
+        operation_forms:
+            - "CampaignChain\\Operation\\LinkedInBundle\\Form\\Type\\ShareNewsItemOperationType"
+        operation_job: "campaignchain.job.operation.linkedin.share_news_item"
 
 services:
-#    campaignchain_activity_linked_in.example:
-#        class: %campaignchain_activity_linked_in.example.class%
-#        arguments: [@service_id, "plain_value", %parameter%]
+    campaignchain.activity.controller.linkedin.share_news_item:
+        class: CampaignChain\CoreBundle\Controller\Module\ActivityModuleController
+        calls:
+            - [setContainer, ["@service_container"]]
+            - [setParameters, ["%campaignchain.activity.linkedin.share_news_item%"]]
+    campaignchain.activity.controller.handler.linkedin.share_news_item:
+        class: CampaignChain\Activity\LinkedInBundle\Controller\ShareNewsItemHandler
+        arguments:
+            - "@campaignchain.operation.linkedin.news_item"
+            - "@templating"
+            - "@campaignchain.channel.linkedin.rest.client"
