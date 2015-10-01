@@ -11,14 +11,15 @@
 namespace CampaignChain\Activity\LinkedInBundle\Controller;
 
 use CampaignChain\Channel\LinkedInBundle\REST\LinkedInClient;
-use CampaignChain\CoreBundle\Controller\Module\ActivityModuleHandlerInterface;
-use CampaignChain\CoreBundle\Entity\Location;
+use CampaignChain\CoreBundle\Controller\Module\AbstractActivityModuleHandler;
 use CampaignChain\Operation\LinkedInBundle\EntityService\NewsItem;
 use Symfony\Bundle\TwigBundle\TwigEngine;
 use Symfony\Component\HttpFoundation\Session\Session;
 use CampaignChain\CoreBundle\Entity\Operation;
+use CampaignChain\CoreBundle\Entity\Activity;
+use CampaignChain\CoreBundle\Entity\Location;
 
-class ShareNewsItemHandler implements ActivityModuleHandlerInterface
+class ShareNewsItemHandler extends AbstractActivityModuleHandler
 {
     protected $detailService;
     protected $restClient;
@@ -44,17 +45,24 @@ class ShareNewsItemHandler implements ActivityModuleHandlerInterface
         return null;
     }
 
-    public function processOperationDetail(Operation $operation, $data)
+    public function processOperationDetails(Operation $operation, $data)
     {
-        $newsItem = $this->detailService->getNewsItemByOperation($operation);
-        $newsItem->setMessage($data['message']);
-        $newsItem->setLinkUrl($data['submitUrl']);
-        $newsItem->setLinkTitle($data['linkTitle']);
-        $newsItem->setLinkDescription($data['description']);
+        try {
+            // If the news item has already been created, we modify its data.
+            $newsItem = $this->detailService->getNewsItemByOperation($operation);
+            $newsItem->setMessage($data['message']);
+            $newsItem->setLinkUrl($data['submitUrl']);
+            $newsItem->setLinkTitle($data['linkTitle']);
+            $newsItem->setLinkDescription($data['description']);
+        } catch (\Exception $e){
+            // News item has not been created yet, so do it from the form data.
+            $newsItem = $data;
+        }
+
         return $newsItem;
     }
 
-    public function readOperationDetail(Operation $operation)
+    public function readOperationDetailsAction(Operation $operation)
     {
         $newsItem = $this->detailService->getNewsItemByOperation($operation);
         $activity = $operation->getActivity();
@@ -63,8 +71,7 @@ class ShareNewsItemHandler implements ActivityModuleHandlerInterface
 
         if(!$newsItem->getLinkedinData()){
             try {
-                $client = $this->container->get('campaignchain.channel.linkedin.rest.client');
-                $connection = $client->connectByActivity($activity);
+                $connection = $this->restClient->connectByActivity($activity);
 
                 // Get the data of the item as stored by Linkedin
                 $request = $connection->get('people/~/network/updates/key='.$newsItem->getUpdateKey().'?format=json');

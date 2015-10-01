@@ -7,16 +7,13 @@
 
 parameters:
     campaignchain.activity.linkedin.share_news_item:
-        activity_bundle_name: "campaignchain/activity-linkedin"
-        activity_module_identifier: "campaignchain-linkedin-share-news-item"
-        operation_bundle_name: "campaignchain/operation-linkedin"
-        operation_module_identifier: "campaignchain-linkedin-share-news-item"
-        location_bundle_name: "campaignchain/location-linkedin"
-        location_module_identifier: "campaignchain-linkedin-user"
-        handler: "campaignchain.activity.controller.handler.linkedin.share_news_item"
+        bundle_name: "campaignchain/activity-linkedin"
+        module_identifier: "campaignchain-linkedin-share-news-item"
+        location: %campaignchain.location.linkedin.user%
         equals_operation: true
-        operation_forms:
-            - "CampaignChain\\Operation\\LinkedInBundle\\Form\\Type\\ShareNewsItemOperationType"
+        operations:
+            - %campaignchain.operation.linkedin.share_news_item%
+        controller_handler: "campaignchain.activity.controller.handler.linkedin.share_news_item"
         operation_job: "campaignchain.job.operation.linkedin.share_news_item"
 
 services:
