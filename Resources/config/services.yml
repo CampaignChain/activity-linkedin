@@ -13,8 +13,7 @@ parameters:
         equals_operation: true
         operations:
             - %campaignchain.operation.linkedin.share_news_item%
-        controller_handler: "campaignchain.activity.controller.handler.linkedin.share_news_item"
-        operation_job: "campaignchain.job.operation.linkedin.share_news_item"
+        handler: "campaignchain.activity.controller.handler.linkedin.share_news_item"
 
 services:
     campaignchain.activity.controller.linkedin.share_news_item:
@@ -26,5 +25,6 @@ services:
         class: CampaignChain\Activity\LinkedInBundle\Controller\ShareNewsItemHandler
         arguments:
             - "@campaignchain.operation.linkedin.news_item"
-            - "@templating"
             - "@campaignchain.channel.linkedin.rest.client"
+            - "@campaignchain.job.operation.linkedin.share_news_item"
+            - "@templating"

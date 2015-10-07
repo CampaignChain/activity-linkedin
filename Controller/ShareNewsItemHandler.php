@@ -11,45 +11,49 @@
 namespace CampaignChain\Activity\LinkedInBundle\Controller;
 
 use CampaignChain\Channel\LinkedInBundle\REST\LinkedInClient;
-use CampaignChain\CoreBundle\Controller\Module\AbstractActivityModuleHandler;
+use CampaignChain\CoreBundle\Controller\Module\AbstractActivityHandler;
 use CampaignChain\Operation\LinkedInBundle\EntityService\NewsItem;
+use CampaignChain\Operation\LinkedInBundle\Job\ShareNewsItem;
 use Symfony\Bundle\TwigBundle\TwigEngine;
 use Symfony\Component\HttpFoundation\Session\Session;
 use CampaignChain\CoreBundle\Entity\Operation;
-use CampaignChain\CoreBundle\Entity\Activity;
+use Symfony\Component\Form\Form;
 use CampaignChain\CoreBundle\Entity\Location;
 
-class ShareNewsItemHandler extends AbstractActivityModuleHandler
+class ShareNewsItemHandler extends AbstractActivityHandler
 {
-    protected $detailService;
+    protected $contentService;
     protected $restClient;
+    protected $job;
     protected $templating;
 
     public function __construct(
-        NewsItem $detailService,
-        TwigEngine $templating,
-        LinkedInClient $restClient
+        NewsItem $contentService,
+        LinkedInClient $restClient,
+        ShareNewsItem $job,
+        TwigEngine $templating
     )
     {
-        $this->detailService = $detailService;
-        $this->templating = $templating;
+        $this->contentService = $contentService;
         $this->restClient = $restClient;
+        $this->job = $job;
+        $this->templating = $templating;
     }
 
-    public function getOperationDetail(Location $location, Operation $operation = null)
+    public function getContent(Location $location, Operation $operation = null)
     {
         if($operation) {
-            return $this->detailService->getNewsItemByOperation($operation);
+            return $this->contentService->getNewsItemByOperation($operation);
         }
 
         return null;
     }
 
-    public function processOperationDetails(Operation $operation, $data)
+    public function processContent(Operation $operation, $data)
     {
         try {
             // If the news item has already been created, we modify its data.
-            $newsItem = $this->detailService->getNewsItemByOperation($operation);
+            $newsItem = $this->contentService->getNewsItemByOperation($operation);
             $newsItem->setMessage($data['message']);
             $newsItem->setLinkUrl($data['submitUrl']);
             $newsItem->setLinkTitle($data['linkTitle']);
@@ -62,9 +66,21 @@ class ShareNewsItemHandler extends AbstractActivityModuleHandler
         return $newsItem;
     }
 
-    public function readOperationDetailsAction(Operation $operation)
+    public function postPersistNewEvent(Operation $operation, Form $form, $content = null)
     {
-        $newsItem = $this->detailService->getNewsItemByOperation($operation);
+        // Content to be published immediately?
+        $this->publishNow($operation, $form);
+    }
+
+    public function postPersistEditEvent(Operation $operation, Form $form, $content = null)
+    {
+        // Content to be published immediately?
+        $this->publishNow($operation, $form);
+    }
+
+    public function readAction(Operation $operation)
+    {
+        $newsItem = $this->contentService->getNewsItemByOperation($operation);
         $activity = $operation->getActivity();
 
         $isLive = true;
@@ -93,5 +109,21 @@ class ShareNewsItemHandler extends AbstractActivityModuleHandler
                 'activity' => $activity,
                 'is_live' => $isLive,
             ));
+    }
+
+    private function publishNow(Operation $operation, Form $form)
+    {
+        if ($form->get('campaignchain_hook_campaignchain_due')->has('execution_choice') && $form->get('campaignchain_hook_campaignchain_due')->get('execution_choice')->getData() == 'now') {
+            $this->job->execute($operation->getId());
+            $content = $this->contentService->getNewsItemByOperation($operation);
+            $this->session->getFlashBag()->add(
+                'success',
+                'The news item was published. <a href="'.$content->getUrl().'">View it on Linkedin</a>.'
+            );
+
+            return true;
+        }
+
+        return false;
     }
 }
