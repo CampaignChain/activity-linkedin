@@ -1,20 +1,20 @@
 campaignchain_activity_linkedin_share_news_item_new:
     pattern:  /activity/linkedin/share-news-item/new
-    defaults: { _controller: CampaignChainActivityLinkedInBundle:ShareNewsItem:new }
+    defaults: { _controller: campaignchain.activity.controller.linkedin.share_news_item:newAction }
 
 campaignchain_activity_linkedin_share_news_item_edit:
     pattern:  /activity/linkedin/share-news-item/{id}/edit
-    defaults: { _controller: CampaignChainActivityLinkedInBundle:ShareNewsItem:edit }
+    defaults: { _controller: campaignchain.activity.controller.linkedin.share_news_item:editAction }
 
 campaignchain_activity_linkedin_share_news_item_edit_modal:
     pattern:  /modal/activity/linkedin/share-news-item/{id}/edit
-    defaults: { _controller: CampaignChainActivityLinkedInBundle:ShareNewsItem:editModal }
+    defaults: { _controller: campaignchain.activity.controller.linkedin.share_news_item:editModalAction }
 
 campaignchain_activity_linkedin_share_news_item_edit_api:
     pattern:  /api/private/activity/linkedin/share-news-item/byactivity/{id}/edit
-    defaults: { _controller: CampaignChainActivityLinkedInBundle:ShareNewsItem:editApi }
+    defaults: { _controller: campaignchain.activity.controller.linkedin.share_news_item:editApiAction }
     options:
         expose: true
 campaignchain_activity_linkedin_share_news_item_read:
     pattern:  /activity/linkedin/share-news-item/{id}
-    defaults: { _controller: CampaignChainActivityLinkedInBundle:ShareNewsItem:read }
+    defaults: { _controller: campaignchain.activity.controller.linkedin.share_news_item:readAction }
