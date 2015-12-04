@@ -14,11 +14,14 @@ use CampaignChain\Channel\LinkedInBundle\REST\LinkedInClient;
 use CampaignChain\CoreBundle\Controller\Module\AbstractActivityHandler;
 use CampaignChain\Operation\LinkedInBundle\EntityService\NewsItem;
 use CampaignChain\Operation\LinkedInBundle\Job\ShareNewsItem;
+use Guzzle\Http\Client;
 use Symfony\Bundle\TwigBundle\TwigEngine;
+use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\HttpFoundation\Session\Session;
 use CampaignChain\CoreBundle\Entity\Operation;
 use Symfony\Component\Form\Form;
 use CampaignChain\CoreBundle\Entity\Location;
+use CampaignChain\Operation\LinkedInBundle\Entity\NewsItem as NewsItemEntity;
 
 class ShareNewsItemHandler extends AbstractActivityHandler
 {
@@ -55,12 +58,13 @@ class ShareNewsItemHandler extends AbstractActivityHandler
             // If the news item has already been created, we modify its data.
             $newsItem = $this->contentService->getNewsItemByOperation($operation);
             $newsItem->setMessage($data['message']);
-            $newsItem->setLinkUrl($data['submitUrl']);
-            $newsItem->setLinkTitle($data['linkTitle']);
-            $newsItem->setLinkDescription($data['description']);
+
+            $newsItem = $this->searchUrl($newsItem, $data);
+
         } catch (\Exception $e){
             // News item has not been created yet, so do it from the form data.
             $newsItem = $data;
+            $newsItem = $this->searchUrl($newsItem, $data);
         }
 
         return $newsItem;
@@ -125,5 +129,75 @@ class ShareNewsItemHandler extends AbstractActivityHandler
         }
 
         return false;
+    }
+
+    /**
+     * Search for a url in the message,
+     * if we find one, then we fetch it
+     *
+     * @param NewsItemEntity $newsItem entity from the DB or the form context
+     * @param NewsItemEntity $data entity from the form
+     * @return NewsItemEntity
+     */
+    private function searchUrl(NewsItemEntity $newsItem, NewsItemEntity $data )
+    {
+        $pattern = '/[-a-zA-Z0-9:%_\+.~#?&\/\/=]{2,256}\.[a-z]{2,10}\b(\/[-a-zA-Z0-9:%_\+.~#?&\/\/=]*)?/i';
+
+        if (!preg_match($pattern, $data->getMessage(), $matches)) {
+            return $newsItem;
+        }
+
+        $url = $matches[0];
+        $result = $this->scrapeUrl($url);
+
+        if (empty($result)) {
+            $newsItem->setUrl(null);
+            $newsItem->setLinkDescription(null);
+            $newsItem->setLinkTitle(null);
+
+            return $newsItem;
+        }
+
+        $newsItem->setLinkUrl($url);
+        $newsItem->setLinkTitle($result['title']);
+        $newsItem->setLinkDescription($result['description']);
+
+        return $newsItem;
+    }
+
+    /**
+     * Extract title and description from the URL
+     *
+     * @param $url
+     * @return array
+     */
+    private function scrapeUrl($url)
+    {
+        if (!parse_url($url, PHP_URL_HOST)) {
+            $url = 'http://' . $url;
+        }
+
+        $client = new Client($url);
+        $guzzleRequest = $client->get();
+
+        try {
+            $response = $guzzleRequest->send();
+        } catch(\Exception $e) {
+            return [];
+        }
+
+        $crawler = new Crawler($response->getBody(true));
+
+        $description = '';
+        foreach ($crawler->filter('meta') as $node) {
+            if ($node->getAttribute('name') == 'description') {
+                $description = $node->getAttribute('content');
+            }
+        }
+
+        return [
+            'title' => trim($crawler->filter('title')->text()),
+            'description' => $description,
+        ];
     }
 }
