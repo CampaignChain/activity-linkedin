@@ -59,12 +59,12 @@ class ShareNewsItemHandler extends AbstractActivityHandler
             $newsItem = $this->contentService->getNewsItemByOperation($operation);
             $newsItem->setMessage($data['message']);
 
-            $newsItem = $this->searchUrl($newsItem, $data);
+            $newsItem = $this->searchUrl($newsItem);
 
         } catch (\Exception $e){
             // News item has not been created yet, so do it from the form data.
             $newsItem = $data;
-            $newsItem = $this->searchUrl($newsItem, $data);
+            $newsItem = $this->searchUrl($newsItem);
         }
 
         return $newsItem;
@@ -139,15 +139,16 @@ class ShareNewsItemHandler extends AbstractActivityHandler
      * @param NewsItemEntity $data entity from the form
      * @return NewsItemEntity
      */
-    private function searchUrl(NewsItemEntity $newsItem, NewsItemEntity $data )
+    private function searchUrl(NewsItemEntity $newsItem)
     {
         $pattern = '/[-a-zA-Z0-9:%_\+.~#?&\/\/=]{2,256}\.[a-z]{2,10}\b(\/[-a-zA-Z0-9:%_\+.~#?&\/\/=]*)?/i';
 
-        if (!preg_match($pattern, $data->getMessage(), $matches)) {
+        if (!preg_match($pattern, $newsItem->getMessage(), $matches)) {
             return $newsItem;
         }
 
         $url = $matches[0];
+
         $result = $this->scrapeUrl($url);
 
         if (empty($result)) {
