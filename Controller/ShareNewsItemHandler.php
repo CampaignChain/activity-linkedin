@@ -12,6 +12,7 @@ namespace CampaignChain\Activity\LinkedInBundle\Controller;
 
 use CampaignChain\Channel\LinkedInBundle\REST\LinkedInClient;
 use CampaignChain\CoreBundle\Controller\Module\AbstractActivityHandler;
+use CampaignChain\CoreBundle\Util\ParserUtil;
 use CampaignChain\Operation\LinkedInBundle\EntityService\NewsItem;
 use CampaignChain\Operation\LinkedInBundle\Job\ShareNewsItem;
 use Guzzle\Http\Client;
@@ -162,7 +163,7 @@ class ShareNewsItemHandler extends AbstractActivityHandler
             return $newsItem;
         }
 
-        $newsItem->setLinkUrl($url);
+        $newsItem->setLinkUrl(ParserUtil::sanitizeUrl($url));
         $newsItem->setLinkTitle($result['title']);
         $newsItem->setLinkDescription($result['description']);
 
