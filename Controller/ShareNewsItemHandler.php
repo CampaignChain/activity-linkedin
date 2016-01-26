@@ -18,11 +18,11 @@ use CampaignChain\Operation\LinkedInBundle\Job\ShareNewsItem;
 use Guzzle\Http\Client;
 use Symfony\Bundle\TwigBundle\TwigEngine;
 use Symfony\Component\DomCrawler\Crawler;
-use Symfony\Component\HttpFoundation\Session\Session;
 use CampaignChain\CoreBundle\Entity\Operation;
 use Symfony\Component\Form\Form;
 use CampaignChain\CoreBundle\Entity\Location;
 use CampaignChain\Operation\LinkedInBundle\Entity\NewsItem as NewsItemEntity;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 class ShareNewsItemHandler extends AbstractActivityHandler
 {
@@ -30,18 +30,21 @@ class ShareNewsItemHandler extends AbstractActivityHandler
     protected $restClient;
     protected $job;
     protected $templating;
+    protected $session;
 
     public function __construct(
         NewsItem $contentService,
         LinkedInClient $restClient,
         ShareNewsItem $job,
-        TwigEngine $templating
+        TwigEngine $templating,
+        Session $session
     )
     {
         $this->contentService = $contentService;
         $this->restClient = $restClient;
         $this->job = $job;
         $this->templating = $templating;
+        $this->session = $session;
     }
 
     public function getContent(Location $location, Operation $operation = null)

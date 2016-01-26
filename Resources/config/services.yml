@@ -9,10 +9,10 @@ parameters:
     campaignchain.activity.linkedin.share_news_item:
         bundle_name: "campaignchain/activity-linkedin"
         module_identifier: "campaignchain-linkedin-share-news-item"
-        location: %campaignchain.location.linkedin.user%
+        location: "%campaignchain.location.linkedin.user%"
         equals_operation: true
         operations:
-            - %campaignchain.operation.linkedin.share_news_item%
+            - "%campaignchain.operation.linkedin.share_news_item%"
         handler: "campaignchain.activity.controller.handler.linkedin.share_news_item"
 
 services:
@@ -28,3 +28,4 @@ services:
             - "@campaignchain.channel.linkedin.rest.client"
             - "@campaignchain.job.operation.linkedin.share_news_item"
             - "@templating"
+            - "@session"
