@@ -93,21 +93,19 @@ class ShareNewsItemHandler extends AbstractActivityHandler
     {
         $newsItem = $this->contentService->getNewsItemByOperation($operation);
         $activity = $operation->getActivity();
+        $locationModuleIdentifier = $activity->getLocation()->getLocationModule()->getIdentifier();
+        $isCompanyPageShare = 'campaignchain-linkedin-page' == $locationModuleIdentifier;
 
         $isLive = true;
 
         if(!$newsItem->getLinkedinData()){
-            try {
-                $connection = $this->restClient->connectByActivity($activity);
-
-                // Get the data of the item as stored by Linkedin
-                $request = $connection->get('people/~/network/updates/key='.$newsItem->getUpdateKey().'?format=json');
-                $response = $request->send()->json();
-
+            $response = $this->restClient->getCompanyUpdate($activity, $newsItem);
+            if (!is_null($response)) {
                 $newsItem->setLinkedinData($response);
 
+                $this->getDoctrine()->getManager()->persist($newsItem);
                 $this->getDoctrine()->getManager()->flush();
-            } catch (\Exception $e) {
+            } else {
                 $isLive = false;
             }
         }
@@ -119,6 +117,7 @@ class ShareNewsItemHandler extends AbstractActivityHandler
                 'news_item' => $newsItem,
                 'activity' => $activity,
                 'is_live' => $isLive,
+                'is_company' => $isCompanyPageShare,
             ));
     }
 
