@@ -15,6 +15,7 @@ use CampaignChain\CoreBundle\Controller\Module\AbstractActivityHandler;
 use CampaignChain\CoreBundle\Util\ParserUtil;
 use CampaignChain\Operation\LinkedInBundle\EntityService\NewsItem;
 use CampaignChain\Operation\LinkedInBundle\Job\ShareNewsItem;
+use Doctrine\ORM\EntityManager;
 use Guzzle\Http\Client;
 use Symfony\Bundle\TwigBundle\TwigEngine;
 use Symfony\Component\DomCrawler\Crawler;
@@ -24,20 +25,46 @@ use CampaignChain\CoreBundle\Entity\Location;
 use CampaignChain\Operation\LinkedInBundle\Entity\NewsItem as NewsItemEntity;
 use Symfony\Component\HttpFoundation\Session\Session;
 
+/**
+ * Class ShareNewsItemHandler
+ * @package CampaignChain\Activity\LinkedInBundle\Controller
+ */
 class ShareNewsItemHandler extends AbstractActivityHandler
 {
+    /** @var NewsItem  */
     protected $contentService;
+
+    /** @var LinkedInClient  */
     protected $restClient;
+
+    /** @var ShareNewsItem  */
     protected $job;
+
+    /** @var TwigEngine  */
     protected $templating;
+
+    /** @var Session  */
     protected $session;
 
+    /** @var EntityManager  */
+    protected $entityManager;
+
+    /**
+     * ShareNewsItemHandler constructor.
+     * @param NewsItem $contentService
+     * @param LinkedInClient $restClient
+     * @param ShareNewsItem $job
+     * @param TwigEngine $templating
+     * @param Session $session
+     * @param EntityManager $entityManager
+     */
     public function __construct(
         NewsItem $contentService,
         LinkedInClient $restClient,
         ShareNewsItem $job,
         TwigEngine $templating,
-        Session $session
+        Session $session,
+        EntityManager $entityManager
     )
     {
         $this->contentService = $contentService;
@@ -45,8 +72,15 @@ class ShareNewsItemHandler extends AbstractActivityHandler
         $this->job = $job;
         $this->templating = $templating;
         $this->session = $session;
+        $this->entityManager = $entityManager;
     }
 
+    /**
+     * @param Location $location
+     * @param Operation|null $operation
+     * @return NewsItemEntity|null
+     * @throws \Exception
+     */
     public function getContent(Location $location, Operation $operation = null)
     {
         if($operation) {
@@ -56,6 +90,11 @@ class ShareNewsItemHandler extends AbstractActivityHandler
         return null;
     }
 
+    /**
+     * @param Operation $operation
+     * @param Form $data
+     * @return array|NewsItemEntity|Form
+     */
     public function processContent(Operation $operation, $data)
     {
         try {
@@ -77,18 +116,33 @@ class ShareNewsItemHandler extends AbstractActivityHandler
         return $newsItem;
     }
 
+    /**
+     * @param Operation $operation
+     * @param Form $form
+     * @param null $content
+     */
     public function postPersistNewEvent(Operation $operation, Form $form, $content = null)
     {
         // Content to be published immediately?
         $this->publishNow($operation, $form);
     }
 
+    /**
+     * @param Operation $operation
+     * @param Form $form
+     * @param null $content
+     */
     public function postPersistEditEvent(Operation $operation, Form $form, $content = null)
     {
         // Content to be published immediately?
         $this->publishNow($operation, $form);
     }
 
+    /**
+     * @param Operation $operation
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \Exception
+     */
     public function readAction(Operation $operation)
     {
         $newsItem = $this->contentService->getNewsItemByOperation($operation);
@@ -104,8 +158,8 @@ class ShareNewsItemHandler extends AbstractActivityHandler
             if (!is_null($response)) {
                 $newsItem->setLinkedinData($response);
 
-                $this->getDoctrine()->getManager()->persist($newsItem);
-                $this->getDoctrine()->getManager()->flush();
+                $this->entityManager->persist($newsItem);
+                $this->entityManager->flush();
             } else {
                 $isLive = false;
             }
@@ -122,6 +176,12 @@ class ShareNewsItemHandler extends AbstractActivityHandler
             ));
     }
 
+    /**
+     * @param Operation $operation
+     * @param Form $form
+     * @return bool
+     * @throws \Exception
+     */
     private function publishNow(Operation $operation, Form $form)
     {
         if ($form->get('campaignchain_hook_campaignchain_due')->has('execution_choice') && $form->get('campaignchain_hook_campaignchain_due')->get('execution_choice')->getData() == 'now') {

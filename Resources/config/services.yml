@@ -29,3 +29,4 @@ services:
             - "@campaignchain.job.operation.linkedin.share_news_item"
             - "@templating"
             - "@session"
+            - "@doctrine.orm.entity_manager"
