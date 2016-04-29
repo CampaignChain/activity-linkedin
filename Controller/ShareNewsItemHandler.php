@@ -99,7 +99,8 @@ class ShareNewsItemHandler extends AbstractActivityHandler
         $isLive = true;
 
         if(!$newsItem->getLinkedinData()){
-            $response = $this->restClient->getCompanyUpdate($activity, $newsItem);
+            $connection = $this->restClient->getConnectionByActivity($activity);
+            $response = $connection->getCompanyUpdate($activity, $newsItem);
             if (!is_null($response)) {
                 $newsItem->setLinkedinData($response);
 
