@@ -263,8 +263,13 @@ class ShareNewsItemHandler extends AbstractActivityHandler
             }
         }
 
+        $title = '';
+        if (count($crawler->filter('title'))) {
+            $title = trim($crawler->filter('title')->text());
+        }
+
         return [
-            'title' => trim($crawler->filter('title')->text()),
+            'title' => $title,
             'description' => $description,
         ];
     }
