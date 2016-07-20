@@ -113,7 +113,6 @@ class ShareNewsItemHandler extends AbstractActivityHandler
             }
 
             $newsItem = $this->searchUrl($newsItem);
-
         } catch (\Exception $e){
             // News item has not been created yet, so do it from the form data.
             $newsItem = $data;
@@ -161,14 +160,28 @@ class ShareNewsItemHandler extends AbstractActivityHandler
 
         if(!$newsItem->getLinkedinData()){
             $connection = $this->restClient->getConnectionByActivity($activity);
-            $response = $connection->getCompanyUpdate($activity, $newsItem);
-            if (!is_null($response)) {
-                $newsItem->setLinkedinData($response);
 
-                $this->entityManager->persist($newsItem);
-                $this->entityManager->flush();
-            } else {
-                $isLive = false;
+            /*
+             * Below calls to the Linkedin REST API will throw errors if the
+             * Linkedin App has not been approved by Linkedin as part of their
+             * partner program.
+             */
+            try {
+                if ($isCompanyPageShare) {
+                    $response = $connection->getCompanyUpdate($activity, $newsItem);
+                } else {
+                    $response = $connection->getUserUpdate($activity, $newsItem);
+                }
+                if (!is_null($response)) {
+                    $newsItem->setLinkedinData($response);
+
+                    $this->entityManager->persist($newsItem);
+                    $this->entityManager->flush();
+                } else {
+                    $isLive = false;
+                }
+            } catch (\Exception $e) {
+                $isLive = true;
             }
         }
 
@@ -218,7 +231,8 @@ class ShareNewsItemHandler extends AbstractActivityHandler
         $pattern = '/[-a-zA-Z0-9:%_\+.~#?&\/\/=]{2,256}\.[a-z]{2,10}\b(\/[-a-zA-Z0-9:%_\+.~#?&\/\/=]*)?/i';
 
         if (!preg_match($pattern, $newsItem->getMessage(), $matches)) {
-            return $newsItem;
+            // No link found, so set link data to null.
+            return $this->unsetUrl($newsItem);
         }
 
         $url = $matches[0];
@@ -226,16 +240,21 @@ class ShareNewsItemHandler extends AbstractActivityHandler
         $result = $this->scrapeUrl($url);
 
         if (empty($result)) {
-            $newsItem->setUrl(null);
-            $newsItem->setLinkDescription(null);
-            $newsItem->setLinkTitle(null);
-
-            return $newsItem;
+            return $this->unsetUrl($newsItem);
         }
 
         $newsItem->setLinkUrl(ParserUtil::sanitizeUrl($url));
         $newsItem->setLinkTitle($result['title']);
         $newsItem->setLinkDescription($result['description']);
+
+        return $newsItem;
+    }
+
+    private function unsetUrl(NewsItemEntity $newsItem)
+    {
+        $newsItem->setLinkUrl(null);
+        $newsItem->setLinkDescription(null);
+        $newsItem->setLinkTitle(null);
 
         return $newsItem;
     }
