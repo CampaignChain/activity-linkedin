@@ -22,7 +22,7 @@ use CampaignChain\CoreBundle\Controller\Module\AbstractActivityHandler;
 use CampaignChain\CoreBundle\Util\ParserUtil;
 use CampaignChain\Operation\LinkedInBundle\EntityService\NewsItem;
 use CampaignChain\Operation\LinkedInBundle\Job\ShareNewsItem;
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Guzzle\Http\Client;
 use Symfony\Bundle\TwigBundle\TwigEngine;
 use Symfony\Component\DomCrawler\Crawler;
@@ -53,8 +53,8 @@ class ShareNewsItemHandler extends AbstractActivityHandler
     /** @var Session  */
     protected $session;
 
-    /** @var EntityManager  */
-    protected $entityManager;
+    /** @var Registry  */
+    protected $em;
 
     /**
      * ShareNewsItemHandler constructor.
@@ -63,7 +63,7 @@ class ShareNewsItemHandler extends AbstractActivityHandler
      * @param ShareNewsItem $job
      * @param TwigEngine $templating
      * @param Session $session
-     * @param EntityManager $entityManager
+     * @param ManagerRegistry $managerRegistry
      */
     public function __construct(
         NewsItem $contentService,
@@ -71,7 +71,7 @@ class ShareNewsItemHandler extends AbstractActivityHandler
         ShareNewsItem $job,
         TwigEngine $templating,
         Session $session,
-        EntityManager $entityManager
+        ManagerRegistry $managerRegistry
     )
     {
         $this->contentService = $contentService;
@@ -79,7 +79,7 @@ class ShareNewsItemHandler extends AbstractActivityHandler
         $this->job = $job;
         $this->templating = $templating;
         $this->session = $session;
-        $this->entityManager = $entityManager;
+        $this->em = $managerRegistry->getManager();
     }
 
     /**
@@ -175,8 +175,8 @@ class ShareNewsItemHandler extends AbstractActivityHandler
                 if (!is_null($response)) {
                     $newsItem->setLinkedinData($response);
 
-                    $this->entityManager->persist($newsItem);
-                    $this->entityManager->flush();
+                    $this->em->persist($newsItem);
+                    $this->em->flush();
                 } else {
                     $isLive = false;
                 }
