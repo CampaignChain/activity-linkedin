@@ -104,20 +104,17 @@ class ShareNewsItemHandler extends AbstractActivityHandler
      */
     public function processContent(Operation $operation, $data)
     {
-        try {
-            if(is_array($data)) {
-                // If the news item has already been created, we modify its data.
-                $newsItem = $this->contentService->getNewsItemByOperation($operation);
+        if(is_array($data)) {
+            // If the news item has already been created, we modify its data.
+            $newsItem = $this->contentService->getNewsItemByOperation($operation);
 
-                $newsItem->setMessage($data['message']);
-            }
-
-            $newsItem = $this->searchUrl($newsItem);
-        } catch (\Exception $e){
+            $newsItem->setMessage($data['message']);
+        } elseif(is_object($data)){
             // News item has not been created yet, so do it from the form data.
             $newsItem = $data;
-            $newsItem = $this->searchUrl($newsItem);
         }
+
+        $newsItem = $this->searchUrl($newsItem);
 
         return $newsItem;
     }
