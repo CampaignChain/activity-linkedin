@@ -15,6 +15,13 @@ campaignchain_activity_linkedin_share_news_item_edit_api:
     defaults: { _controller: campaignchain.activity.controller.linkedin.share_news_item:editApiAction }
     options:
         expose: true
+
 campaignchain_activity_linkedin_share_news_item_read:
     pattern:  /activity/linkedin/share-news-item/{id}
     defaults: { _controller: campaignchain.activity.controller.linkedin.share_news_item:readAction }
+
+campaignchain_activity_linkedin_share_news_item_read_modal:
+    pattern:  /modal/activity/linkedin/share-news-item/{id}
+    defaults: { _controller: campaignchain.activity.controller.linkedin.share_news_item:readModalAction }
+    options:
+        expose: true

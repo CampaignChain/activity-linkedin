@@ -149,10 +149,11 @@ class ShareNewsItemHandler extends AbstractActivityHandler
 
     /**
      * @param Operation $operation
+     * @param bool $isModal Modal view yes or no?
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \Exception
      */
-    public function readAction(Operation $operation)
+    public function readAction(Operation $operation, $isModal = false)
     {
         $newsItem = $this->contentService->getNewsItemByOperation($operation);
         $activity = $operation->getActivity();
@@ -188,8 +189,14 @@ class ShareNewsItemHandler extends AbstractActivityHandler
             }
         }
 
+        if(!$isModal){
+            $twigTpl = 'CampaignChainOperationLinkedInBundle::read.html.twig';
+        } else {
+            $twigTpl = 'CampaignChainOperationLinkedInBundle::read_modal.html.twig';
+        }
+
         return $this->templating->renderResponse(
-            'CampaignChainOperationLinkedInBundle::read.html.twig',
+            $twigTpl,
             array(
                 'page_title' => $activity->getName(),
                 'news_item' => $newsItem,
