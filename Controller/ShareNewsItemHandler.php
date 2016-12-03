@@ -31,6 +31,7 @@ use Symfony\Component\Form\Form;
 use CampaignChain\CoreBundle\Entity\Location;
 use CampaignChain\Operation\LinkedInBundle\Entity\NewsItem as NewsItemEntity;
 use Symfony\Component\HttpFoundation\Session\Session;
+use CampaignChain\CoreBundle\Util\SchedulerUtil;
 
 /**
  * Class ShareNewsItemHandler
@@ -56,6 +57,9 @@ class ShareNewsItemHandler extends AbstractActivityHandler
     /** @var Registry  */
     protected $em;
 
+    /** @var  SchedulerUtil */
+    protected $schedulerUtil;
+
     /**
      * ShareNewsItemHandler constructor.
      * @param NewsItem $contentService
@@ -71,7 +75,8 @@ class ShareNewsItemHandler extends AbstractActivityHandler
         ShareNewsItem $job,
         TwigEngine $templating,
         Session $session,
-        ManagerRegistry $managerRegistry
+        ManagerRegistry $managerRegistry,
+        SchedulerUtil $schedulerUtil
     )
     {
         $this->contentService = $contentService;
@@ -80,6 +85,7 @@ class ShareNewsItemHandler extends AbstractActivityHandler
         $this->templating = $templating;
         $this->session = $session;
         $this->em = $managerRegistry->getManager();
+        $this->schedulerUtil = $schedulerUtil;
     }
 
     /**
@@ -124,10 +130,10 @@ class ShareNewsItemHandler extends AbstractActivityHandler
      * @param Form $form
      * @param null $content
      */
-    public function postPersistNewEvent(Operation $operation, Form $form, $content = null)
+    public function postPersistNewEvent(Operation $operation, $content = null)
     {
         // Content to be published immediately?
-        $this->publishNow($operation, $form);
+        $this->publishNow($operation);
     }
 
     /**
@@ -135,10 +141,10 @@ class ShareNewsItemHandler extends AbstractActivityHandler
      * @param Form $form
      * @param null $content
      */
-    public function postPersistEditEvent(Operation $operation, Form $form, $content = null)
+    public function postPersistEditEvent(Operation $operation, $content = null)
     {
         // Content to be published immediately?
-        $this->publishNow($operation, $form);
+        $this->publishNow($operation);
     }
 
     /**
@@ -199,10 +205,9 @@ class ShareNewsItemHandler extends AbstractActivityHandler
      * @return bool
      * @throws \Exception
      */
-    private function publishNow(Operation $operation, Form $form)
+    private function publishNow(Operation $operation)
     {
-        if ($form->get('campaignchain_hook_campaignchain_due')->has('execution_choice') && $form->get('campaignchain_hook_campaignchain_due')->get('execution_choice')->getData() == 'now') {
-            $this->job->execute($operation->getId());
+        if ($this->schedulerUtil->isDueNow($operation->getStartDate())) {            $this->job->execute($operation->getId());
             $content = $this->contentService->getNewsItemByOperation($operation);
             $this->session->getFlashBag()->add(
                 'success',

@@ -37,3 +37,4 @@ services:
             - "@templating"
             - "@session"
             - "@doctrine"
+            - "@campaignchain.core.util.scheduler"
