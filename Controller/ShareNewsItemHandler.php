@@ -23,7 +23,7 @@ use CampaignChain\CoreBundle\Util\ParserUtil;
 use CampaignChain\Operation\LinkedInBundle\EntityService\NewsItem;
 use CampaignChain\Operation\LinkedInBundle\Job\ShareNewsItem;
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Guzzle\Http\Client;
+use GuzzleHttp\Client;
 use Symfony\Bundle\TwigBundle\TwigEngine;
 use Symfony\Component\DomCrawler\Crawler;
 use CampaignChain\CoreBundle\Entity\Operation;
@@ -280,16 +280,14 @@ class ShareNewsItemHandler extends AbstractActivityHandler
             $url = 'http://' . $url;
         }
 
-        $client = new Client($url);
-        $guzzleRequest = $client->get();
-
         try {
-            $response = $guzzleRequest->send();
+            $client = new Client();
+            $response = $client->get($url);
         } catch(\Exception $e) {
             return [];
         }
 
-        $crawler = new Crawler($response->getBody(true));
+        $crawler = new Crawler($response->getBody()->getContents());
 
         $description = '';
         foreach ($crawler->filter('meta') as $node) {
